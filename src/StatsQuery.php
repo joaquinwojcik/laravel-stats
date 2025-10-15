@@ -239,16 +239,26 @@ class StatsQuery
     protected function queryStats(): Builder
     {
         if ($this->subject instanceof Relation) {
-            return $this->subject->getQuery()->clone()->where($this->attributes);
+            $query = $this->subject->getQuery()->clone();
+        } else {
+            /** @var Model $subject */
+            $subject = $this->subject;
+            if (is_string($subject) && class_exists($subject)) {
+                $subject = new $subject;
+            }
+            $query = $subject->newQuery();
         }
 
-        /** @var Model $subject */
-        $subject = $this->subject;
-        if (is_string($subject) && class_exists($subject)) {
-            $subject = new $subject;
+        // Apply attributes with proper handling of null values
+        foreach ($this->attributes as $key => $value) {
+            if ($value === null) {
+                $query->whereNull($key);
+            } else {
+                $query->where($key, $value);
+            }
         }
 
-        return $subject->newQuery()->where($this->attributes);
+        return $query;
     }
 
     protected function getDifferencesPerPeriod(): EloquentCollection
