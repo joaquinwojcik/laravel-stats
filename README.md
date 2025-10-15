@@ -171,6 +171,101 @@ This will return an array containing arrayable `Spatie\Stats\DataPoint` objects.
 ]
 ```
 
+## Tenant-Aware Stats (New)
+
+This package now supports flexible tenant-aware statistics with a powerful fluent API. You can track stats per model with optional tenant context.
+
+### Creating Stat Models
+
+Use the artisan command to generate stat models:
+
+```bash
+# Create a tenant-aware stat model (includes tenant_id column)
+php artisan stats:make User --tenant-aware
+
+# Create a non-tenant-aware stat model (no tenant_id column)
+php artisan stats:make Tenant
+```
+
+This generates:
+- A migration file with the appropriate schema
+- A model class extending `BaseStatModel`
+
+### Tenant-Aware Stats
+
+For models like User or Post where you want to track stats within tenant contexts:
+
+```php
+use App\Models\UserStat;
+
+// Track user stats in specific tenant
+UserStat::for($user)->on($tenant)->increase('logins');
+UserStat::for($user)->on($tenant)->set('posts_created', 42);
+UserStat::for($user)->on($tenant)->decrease('credits', 10);
+
+// Same user, different tenants - stats are isolated
+UserStat::for($user)->on($tenant1)->increase('logins');
+UserStat::for($user)->on($tenant2)->increase('logins');
+
+// Track global stats without tenant context
+UserStat::for($user)->increase('global_reputation');
+
+// Query stats for specific tenant
+$stats = UserStat::for($user)
+    ->on($tenant)
+    ->query('logins')
+    ->start(now()->subMonth())
+    ->groupByDay()
+    ->get();
+```
+
+### Non-Tenant-Aware Stats
+
+For models like Tenant itself, where you want to track the model's own metrics:
+
+```php
+use App\Models\TenantStat;
+
+// Track tenant's own metrics (no tenant context needed)
+TenantStat::for($tenant)->increase('active_users');
+TenantStat::for($tenant)->set('storage_mb', 1024);
+TenantStat::for($tenant)->increase('api_calls');
+
+// Query tenant's metrics
+$stats = TenantStat::for($tenant)
+    ->query('active_users')
+    ->start(now()->subMonth())
+    ->groupByDay()
+    ->get();
+```
+
+**Note:** Calling `->on()` on a non-tenant-aware stat model will throw a `BadMethodCallException`.
+
+### Historical Tracking
+
+Track stats with custom timestamps:
+
+```php
+UserStat::for($user)->on($tenant)->increase('purchases', 1, $order->created_at);
+TenantStat::for($tenant)->set('total_revenue', 50000, now()->subMonth());
+```
+
+### Alternative Syntax
+
+Set stat name first, then perform operations:
+
+```php
+UserStat::for($user)->on($tenant)->stat('logins')->increase();
+TenantStat::for($tenant)->stat('api_calls')->increase(100);
+```
+
+### How It Works
+
+- **Tenant-aware models** (using `IsTenantAware` trait) have a `tenant_id` column and support `->on($tenant)`
+- **Non-tenant-aware models** track the model's own stats without an additional tenant scope
+- Each stat model explicitly declares if it's tenant-aware via the trait
+- Stats are stored in separate tables per model (`user_stats`, `tenant_stats`, etc.)
+
 ## Extended Use-Cases
 
 ### Read and Write from a custom Model

@@ -4,6 +4,7 @@ namespace Spatie\Stats;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Spatie\Stats\Console\MakeStatsCommand;
 
 class StatsServiceProvider extends PackageServiceProvider
 {
@@ -11,6 +12,7 @@ class StatsServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('stats')
-            ->hasMigration('create_stats_tables');
+            ->hasMigration('create_stats_tables')
+            ->hasCommand(MakeStatsCommand::class);
     }
 }

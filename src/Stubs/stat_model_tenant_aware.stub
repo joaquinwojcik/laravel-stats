@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Spatie\Stats\BaseStatModel;
+use Spatie\Stats\Traits\IsTenantAware;
+
+class {{ class }} extends BaseStatModel
+{
+    use IsTenantAware;
+
+    public function {{ relation }}()
+    {
+        return $this->belongsTo({{ model }}::class);
+    }
+
+    public static function getModelForeignKey(): string
+    {
+        return '{{ foreign_key }}';
+    }
+}
