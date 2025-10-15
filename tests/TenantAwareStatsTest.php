@@ -222,23 +222,40 @@ class TenantAwareStatsTest extends TestCase
         $tenant1 = Tenant::create(['name' => 'Tenant 1']);
         $tenant2 = Tenant::create(['name' => 'Tenant 2']);
 
-        // Add stats to tenant1
-        UserStat::for($user)->on($tenant1)->set('posts', 10);
-        UserStat::for($user)->on($tenant1)->increase('posts', 5);
+        // Add stats to tenant1 with timestamps
+        UserStat::for($user)->on($tenant1)->set('posts', 10, now()->subDays(2));
+        UserStat::for($user)->on($tenant1)->increase('posts', 5, now()->subDay());
 
-        // Add stats to tenant2
-        UserStat::for($user)->on($tenant2)->set('posts', 20);
+        // Add stats to tenant2 with timestamp
+        UserStat::for($user)->on($tenant2)->set('posts', 20, now()->subDays(2));
 
         // Query tenant1 - should only see tenant1 stats
-        $tenant1Query = UserStat::for($user)->on($tenant1)->query('posts');
-        $tenant1Value = $tenant1Query->getValue(now());
+        $tenant1Value = UserStat::for($user)
+            ->on($tenant1)
+            ->query('posts')
+            ->getValue(now());
 
         // Query tenant2 - should only see tenant2 stats
-        $tenant2Query = UserStat::for($user)->on($tenant2)->query('posts');
-        $tenant2Value = $tenant2Query->getValue(now());
+        $tenant2Value = UserStat::for($user)
+            ->on($tenant2)
+            ->query('posts')
+            ->getValue(now());
 
         $this->assertEquals(15, $tenant1Value); // 10 + 5
         $this->assertEquals(20, $tenant2Value);
+
+        // Verify isolation - stats are separate per tenant
+        $tenant1Stats = UserStat::where('user_id', $user->id)
+            ->where('tenant_id', $tenant1->id)
+            ->where('name', 'posts')
+            ->count();
+        $tenant2Stats = UserStat::where('user_id', $user->id)
+            ->where('tenant_id', $tenant2->id)
+            ->where('name', 'posts')
+            ->count();
+
+        $this->assertEquals(2, $tenant1Stats); // set + increase
+        $this->assertEquals(1, $tenant2Stats); // set only
     }
 
     /** @test */

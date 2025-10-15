@@ -127,20 +127,36 @@ class NonTenantAwareStatsTest extends TestCase
         $tenant1 = Tenant::create(['name' => 'Tenant 1']);
         $tenant2 = Tenant::create(['name' => 'Tenant 2']);
 
-        TenantStat::for($tenant1)->set('active_users', 50);
-        TenantStat::for($tenant1)->increase('active_users', 10);
+        // Tenant 1 stats with timestamps
+        TenantStat::for($tenant1)->set('active_users', 50, now()->subDays(2));
+        TenantStat::for($tenant1)->increase('active_users', 10, now()->subDay());
 
-        TenantStat::for($tenant2)->set('active_users', 100);
-        TenantStat::for($tenant2)->increase('active_users', 20);
+        // Tenant 2 stats with timestamps
+        TenantStat::for($tenant2)->set('active_users', 100, now()->subDays(2));
+        TenantStat::for($tenant2)->increase('active_users', 20, now()->subDay());
 
-        $tenant1Query = TenantStat::for($tenant1)->query('active_users');
-        $tenant1Value = $tenant1Query->getValue(now());
+        // Query and get current values
+        $tenant1Value = TenantStat::for($tenant1)
+            ->query('active_users')
+            ->getValue(now());
 
-        $tenant2Query = TenantStat::for($tenant2)->query('active_users');
-        $tenant2Value = $tenant2Query->getValue(now());
+        $tenant2Value = TenantStat::for($tenant2)
+            ->query('active_users')
+            ->getValue(now());
 
         $this->assertEquals(60, $tenant1Value); // 50 + 10
         $this->assertEquals(120, $tenant2Value); // 100 + 20
+
+        // Verify isolation - each tenant has their own stats
+        $tenant1Stats = TenantStat::where('tenant_id', $tenant1->id)
+            ->where('name', 'active_users')
+            ->count();
+        $tenant2Stats = TenantStat::where('tenant_id', $tenant2->id)
+            ->where('name', 'active_users')
+            ->count();
+
+        $this->assertEquals(2, $tenant1Stats); // set + increase
+        $this->assertEquals(2, $tenant2Stats); // set + increase
     }
 
     /** @test */
