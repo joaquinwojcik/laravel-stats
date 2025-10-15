@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-stats` will be documented in this file
 
+## 3.0.0 - 2025-10-15
+
+Tenant aware stats
+
 ## 2.3.1 - 2025-03-08
 
 **Full Changelog**: https://github.com/spatie/laravel-stats/compare/2.3.0...2.3.1
