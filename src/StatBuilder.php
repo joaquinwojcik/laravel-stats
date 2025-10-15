@@ -103,19 +103,18 @@ class StatBuilder
         $modelClass = $this->statModelClass;
         $foreignKey = $modelClass::getModelForeignKey();
 
-        $query = $modelClass::where($foreignKey, $this->model->id)
-            ->where('name', $name);
+        // Build attributes array for StatsQuery filtering
+        $attributes = [
+            $foreignKey => $this->model->id,
+            'name' => $name,
+        ];
 
-        // Only filter by tenant_id if model is tenant-aware
+        // Only add tenant_id filtering if model is tenant-aware
         if ($modelClass::isTenantAware()) {
-            if ($this->tenantId !== null) {
-                $query->where('tenant_id', $this->tenantId);
-            } else {
-                $query->whereNull('tenant_id');
-            }
+            $attributes['tenant_id'] = $this->tenantId;
         }
 
-        return StatsQuery::for($query);
+        return StatsQuery::for($modelClass, $attributes);
     }
 
     /**
