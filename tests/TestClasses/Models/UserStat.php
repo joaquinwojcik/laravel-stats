@@ -3,7 +3,6 @@
 namespace Spatie\Stats\Tests\TestClasses\Models;
 
 use Spatie\Stats\BaseStatModel;
-use Spatie\Stats\Tests\TestClasses\Models\User;
 use Spatie\Stats\Traits\IsTenantAware;
 
 class UserStat extends BaseStatModel

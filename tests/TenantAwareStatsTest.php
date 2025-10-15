@@ -2,7 +2,6 @@
 
 namespace Spatie\Stats\Tests;
 
-use BadMethodCallException;
 use Carbon\Carbon;
 use Spatie\Stats\Tests\TestClasses\Models\Tenant;
 use Spatie\Stats\Tests\TestClasses\Models\User;

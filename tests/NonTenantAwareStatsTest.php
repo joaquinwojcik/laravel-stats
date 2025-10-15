@@ -187,7 +187,7 @@ class NonTenantAwareStatsTest extends TestCase
         $this->assertContains('tenant_id', $columns);
 
         // Count tenant_id columns - should only be one
-        $tenantIdCount = count(array_filter($columns, fn($col) => $col === 'tenant_id'));
+        $tenantIdCount = count(array_filter($columns, fn ($col) => $col === 'tenant_id'));
         $this->assertEquals(1, $tenantIdCount);
     }
 }
