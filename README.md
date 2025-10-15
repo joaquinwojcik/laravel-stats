@@ -34,6 +34,7 @@ $stats = SubscriptionStats::query()
     ->get();
 ```
 
+
 This will return an array like this one:
 
 ```php 
