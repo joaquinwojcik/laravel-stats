@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateTimeStatsTables extends Migration
+{
+    public function up()
+    {
+        Schema::create('time_stats_events', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('name')->nullable();
+            $table->string('type'); // 'start' or 'completed'
+            $table->string('identifier')->nullable(); // Unique identifier for start/end tracking
+
+            $table->timestamp('started_at');
+            $table->timestamp('ended_at')->nullable();
+            $table->bigInteger('duration_ms')->nullable(); // Duration in milliseconds
+
+            $table->json('context')->nullable(); // Additional context data
+
+            $table->timestamps();
+
+            // Indexes for performance
+            $table->index(['name', 'type', 'started_at']);
+            $table->index(['name', 'identifier', 'type']);
+            $table->index('started_at');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('time_stats_events');
+    }
+}
