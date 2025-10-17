@@ -312,7 +312,7 @@ class TimeStatsQueryTest extends TimeStatsTestCase
             ->get();
 
         // Should only include the event from 1 day ago
-        $totalCount = $stats->sum(fn($s) => $s->count);
+        $totalCount = $stats->sum(fn ($s) => $s->count);
         $this->assertEquals(1, $totalCount);
     }
 }

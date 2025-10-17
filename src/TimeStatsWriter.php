@@ -62,7 +62,7 @@ class TimeStatsWriter
             ->orderByDesc('started_at')
             ->first();
 
-        if (!$startEvent) {
+        if (! $startEvent) {
             return null;
         }
 
@@ -126,7 +126,7 @@ class TimeStatsWriter
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
             'duration_ms' => $durationMs,
-            'context' => !empty($context) ? $context : null,
+            'context' => ! empty($context) ? $context : null,
             'created_at' => now(),
         ]);
 

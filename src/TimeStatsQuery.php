@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class TimeStatsQuery
 {
@@ -35,48 +34,56 @@ class TimeStatsQuery
     public function groupByYear(): self
     {
         $this->period = 'year';
+
         return $this;
     }
 
     public function groupByMonth(): self
     {
         $this->period = 'month';
+
         return $this;
     }
 
     public function groupByWeek(): self
     {
         $this->period = 'week';
+
         return $this;
     }
 
     public function groupByDay(): self
     {
         $this->period = 'day';
+
         return $this;
     }
 
     public function groupByHour(): self
     {
         $this->period = 'hour';
+
         return $this;
     }
 
     public function groupByMinute(): self
     {
         $this->period = 'minute';
+
         return $this;
     }
 
     public function start(DateTimeInterface $start): self
     {
         $this->start = $start;
+
         return $this;
     }
 
     public function end(DateTimeInterface $end): self
     {
         $this->end = $end;
+
         return $this;
     }
 
@@ -95,7 +102,7 @@ class TimeStatsQuery
 
             $periodStats = $stats->get($periodKey);
 
-            if (!$periodStats) {
+            if (! $periodStats) {
                 return new TimeDataPoint(
                     start: $periodStart,
                     end: $periodEnd,

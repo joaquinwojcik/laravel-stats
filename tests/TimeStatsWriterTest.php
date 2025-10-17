@@ -4,8 +4,8 @@ namespace Spatie\Stats\Tests;
 
 use Carbon\Carbon;
 use Spatie\Stats\Models\TimeStatsEvent;
-use Spatie\Stats\TimeStatsWriter;
 use Spatie\Stats\Tests\TestClasses\Models\Stat;
+use Spatie\Stats\TimeStatsWriter;
 
 class TimeStatsWriterTest extends TimeStatsTestCase
 {
